@@ -8,11 +8,43 @@ import org.litepal.crud.DataSupport;
  */
 
 public class City extends DataSupport {
-    public int id;
+    private int id;
     /**市名*/
-    public String cityName;
-    /**市编号*/
-    public int cityCode;
+    private String cityName;
+    /**市代码*/
+    private int cityCode;
     /**所属省份id*/
-    public int provinceId;
+    private int provinceId;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public int getCityCode() {
+        return cityCode;
+    }
+
+    public void setCityCode(int cityCode) {
+        this.cityCode = cityCode;
+    }
+
+    public int getProvinceId() {
+        return provinceId;
+    }
+
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
+    }
 }
