@@ -1,17 +1,21 @@
 package com.xzh.coolweather.activity;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.xzh.coolweather.R;
 
 import java.io.IOException;
@@ -22,9 +26,15 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import util.HttpUtil;
+import util.LogUtil;
 import util.Utility;
 
 public class WeatherActivity extends AppCompatActivity {
+
+    /**
+     * 必应每日一图
+     */
+    private ImageView bingPicImg;
     /**
      * 滚动显示
      */
@@ -73,12 +83,30 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 判断当前版本5.0以上
+        if (Build.VERSION.SDK_INT >= 21) {
+            // 获取当前活动的DecorView
+            View decorView = getWindow().getDecorView();
+            // 改变系统UI的显示, 活动的布局显示在状态栏上
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            // 设置状态栏为透明色
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
         setContentView(R.layout.activity_weather);
 
         // 初始化控件
         initUI();
         // 缓存
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // 获取必应每日一图缓存
+        String bingPic = prefs.getString("bing_pic", null);
+        if (bingPic != null) {
+            // 存在 -- 加载图片并添加到控件中
+            Glide.with(this).load(bingPic).into(bingPicImg);
+        } else {
+            // 不存在 -- 请求服务器获取
+            loadBingPic();
+        }
         // 获取天气缓存
         String weatherString = prefs.getString("weather", null);
         // 判断缓存是否存在
@@ -97,10 +125,12 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * 初始化控件
      */
     private void initUI() {
+        bingPicImg = findViewById(R.id.bing_pic_img);
         weatherLayout = findViewById(R.id.weather_layout);
         titleCity = findViewById(R.id.title_city);
         titleUpdateTime = findViewById(R.id.title_update_time);
@@ -113,6 +143,41 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText = findViewById(R.id.car_wash_text);
         sportText = findViewById(R.id.sport_text);
 
+    }
+
+    /**
+     * 加载必应每日一图
+     */
+    private void loadBingPic() {
+        // 服务器地址
+        String requestBingPic = "http://guolin.tech/api/bing_pic";
+        // 请求并处理响应
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // 获取响应
+                final String bingPic = response.body().string();
+                LogUtil.v("WeatherActivity", bingPic);
+                // 缓存修改
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                // 添加必应每日一图
+                editor.putString("bing_pic", bingPic);
+                // 提交
+                editor.apply();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 加载图片并添加到控件中
+                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+                    }
+                });
+            }
+        });
     }
 
     /**
