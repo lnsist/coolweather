@@ -2,6 +2,8 @@ package util;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +11,7 @@ import org.json.JSONObject;
 import db.City;
 import db.County;
 import db.Province;
+import gson.Weather;
 
 /**
  * 解析并处理省市县数据
@@ -115,5 +118,24 @@ public class Utility {
         }
 
         return false;
+    }
+
+    /**
+     * 将返回的JSOn数据解析成Weather实体类
+     */
+    public static Weather handleWeatherResponse(String response) {
+        try {
+            // 将返回的String转换为JSON
+            JSONObject jsonObject = new JSONObject(response);
+            // 获取天气信息集合
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            // 转换为String
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            // 封装成实体类
+            return new Gson().fromJson(weatherContent, Weather.class);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

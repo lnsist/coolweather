@@ -1,6 +1,7 @@
 package com.xzh.coolweather.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xzh.coolweather.R;
+import com.xzh.coolweather.activity.WeatherActivity;
 
 import org.litepal.crud.DataSupport;
 
@@ -149,6 +151,17 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCity = cityList.get(i);
                     // 查询下级内容
                     queryCounties();
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    // 获取当前天气id
+                    String weatherId = countyList.get(i).getWeatherId();
+                    // 设置意图
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    // 添加意图信息
+                    intent.putExtra("weather_id", weatherId);
+                    // 跳转
+                    startActivity(intent);
+                    // 结束当前活动
+                    getActivity().finish();
                 }
             }
         });
@@ -235,7 +248,7 @@ public class ChooseAreaFragment extends Fragment {
             // 网络请求地址
             String address = "http://guolin.tech/api/china/" + provinceCode;
             // 通过网络查询内容
-            LogUtil.v(TAG,"address = " + address);
+            LogUtil.v(TAG, "address = " + address);
             queryFromServer(address, "city");
         }
     }
@@ -272,7 +285,7 @@ public class ChooseAreaFragment extends Fragment {
             int cityCode = selectedCity.getCityCode();
             // 网络请求地址
             String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
-            LogUtil.v(TAG,"address = " + address);
+            LogUtil.v(TAG, "address = " + address);
             // 通过网络查询内容
 
             queryFromServer(address, "county");
@@ -319,7 +332,7 @@ public class ChooseAreaFragment extends Fragment {
                                 // 回调
                                 queryCities();
                                 // 县级
-                            } else if ("county".equals(type)){
+                            } else if ("county".equals(type)) {
                                 // 回调
                                 queryCounties();
                             }
@@ -342,8 +355,10 @@ public class ChooseAreaFragment extends Fragment {
         });
     }
 
-    /**显示进度对话框*/
-    private void showProgressDialog(){
+    /**
+     * 显示进度对话框
+     */
+    private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("正在加载...");
@@ -352,8 +367,10 @@ public class ChooseAreaFragment extends Fragment {
         progressDialog.show();
     }
 
-    /**关闭进度对话框*/
-    private void closeProgressDialog(){
+    /**
+     * 关闭进度对话框
+     */
+    private void closeProgressDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
