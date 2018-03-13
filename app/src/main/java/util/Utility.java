@@ -103,7 +103,7 @@ public class Utility {
                     County county = new County();
                     // 获取各个数据
                     county.setCountyName(countyObject.getString("name"));
-                    county.setWeatherId(countyObject.getInt("weather_id"));
+                    county.setWeatherId(countyObject.getString("weather_id"));
                     county.setCityId(cityId);
                     // 将数据存储到数据库中
                     county.save();

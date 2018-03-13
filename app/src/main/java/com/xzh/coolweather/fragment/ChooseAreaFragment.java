@@ -29,6 +29,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import util.HttpUtil;
+import util.LogUtil;
 import util.Utility;
 
 /**
@@ -36,6 +37,9 @@ import util.Utility;
  */
 
 public class ChooseAreaFragment extends Fragment {
+
+    private static final String TAG = "ChooseAreaFragment";
+
     /**
      * 省级
      */
@@ -231,6 +235,7 @@ public class ChooseAreaFragment extends Fragment {
             // 网络请求地址
             String address = "http://guolin.tech/api/china/" + provinceCode;
             // 通过网络查询内容
+            LogUtil.v(TAG,"address = " + address);
             queryFromServer(address, "city");
         }
     }
@@ -266,8 +271,10 @@ public class ChooseAreaFragment extends Fragment {
             // 当前市级代码
             int cityCode = selectedCity.getCityCode();
             // 网络请求地址
-            String address = "http://guolin.tech/api/china" + provinceCode + "/" + cityCode;
+            String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+            LogUtil.v(TAG,"address = " + address);
             // 通过网络查询内容
+
             queryFromServer(address, "county");
         }
     }
