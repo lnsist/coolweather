@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xzh.coolweather.R;
+import com.xzh.coolweather.activity.MainActivity;
 import com.xzh.coolweather.activity.WeatherActivity;
 
 import org.litepal.crud.DataSupport;
@@ -154,14 +155,26 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (currentLevel == LEVEL_COUNTY) {
                     // 获取当前天气id
                     String weatherId = countyList.get(i).getWeatherId();
-                    // 设置意图
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    // 添加意图信息
-                    intent.putExtra("weather_id", weatherId);
-                    // 跳转
-                    startActivity(intent);
-                    // 结束当前活动
-                    getActivity().finish();
+                    // 判断当前Activity属于哪个Activity
+                    if (getActivity() instanceof MainActivity) {
+                        // 设置意图
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        // 添加意图信息
+                        intent.putExtra("weather_id", weatherId);
+                        // 跳转
+                        startActivity(intent);
+                        // 结束当前活动
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        // 获取当前Activity -- 天气
+                        WeatherActivity activity = (WeatherActivity) getActivity();
+                        // 关闭滑动菜单
+                        activity.drawerLayout.closeDrawers();
+                        // 下拉刷新开启
+                        activity.swipeRefresh.setRefreshing(true);
+                        // 手动刷新当前城市天气
+                        activity.requestWeather(weatherId);
+                    }
                 }
             }
         });
